@@ -68,7 +68,8 @@ const loginUser = async (req, res) => {
                 if(err) throw err;
                 res.cookie('token', token).json(user)
             })
-        } else {
+        } 
+        if(!match) {
             res.json({
                 error: 'Invalid Password'
             })
