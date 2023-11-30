@@ -1,47 +1,45 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import axios from 'axios';
+import {toast} from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
 
 function Login() {
-    const [username, setUsername] = useState('');
-    const navigate = useNavigate();
-    const [error, setError] = useState('');
-  
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-  
-      try {
-        // Fetch user data based on username
-        const response = await axios.get(`http://localhost:3000/users/${username}`);
-        const user = response.data;
-  
-        if (user) {
-          navigate(`/dashboard`);
+const navigate = useNavigate();
+const [data, setData] = useState({
+    email: '',
+    password: '',
+})
+
+const loginUser = async (e) => {
+    e.preventDefault();
+    const {email, password} = data
+    try {
+        const {data} = await axios.post('http://localhost:3000/login', {
+            email,
+            password
+        });
+        if(data.error) {
+            toast.error(data.error)
+        } else {
+            setData({});
+            navigate('/')
         }
-      } catch (error) {
-        // Handle error cases (e.g., server unreachable, etc.)
-        console.error('Login error:', error);
-        setError('User not found');
-      }
-    };
+    } catch (error) {
+
+    }
+}
 
     return (
     <div>
-      <h1>Testing</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Username:
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </label>
-        <button type="submit">Submit</button>
-      </form>
-      {error && <p style={{ color: 'red' }}>{error}</p>}
+        <form onSubmit={loginUser}>
+            <label>Email</label>
+            <input type='email' placeholder='Enter your email address' value={data.email} onChange={(e) => setData({...data, email: e.target.value})}/>
+            <label>Password</label>
+            <input type='password' placeholder='Enter your password' value={data.password} onChange={(e) => setData({...data, password: e.target.value})}/>
+            <button type='submit'>Login</button>
+        </form>
     </div>
-    );
+    )
   }
 
   export default Login;
